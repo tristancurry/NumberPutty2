@@ -15,22 +15,38 @@
    
 
 Physics(function( world ){
-
+	function drawBlob(nB){
+	
+	
+	
+	}
 
    
 	var bounds = Physics.aabb(0, 0, 500, 500);
 	var clicks = 0;
+	
+	
+	Physics.body('numberBlob', 'circle', function( parent ){
+	
+	
+
+    return {
+	
+		
+
+		};
+	});
 
    help = function(){
 	   clicks++;
-	   world.add( Physics.body('rectangle', {
+	   world.add( Physics.body('numberBlob', {
 			x: 12,
 			y: 12,
 			vx: 0.05,
-			width: 50,
-			height: 50,
-			restitution: 0.3,
-			mass:10
+			radius: 25,
+			restitution: 0.9,
+			mass:10,
+			value: Math.random()
 		} ))
 	console.log("pressed " + clicks + " times");
 
@@ -40,16 +56,32 @@ Physics(function( world ){
 	
 
    
-	var renderer = Physics.renderer('canvas', {
+	/*var renderer = Physics.renderer('canvas', {
 		autoResize: false,
 		el: 'viewport', // id of the canvas element
 		width: 500,
 		height: 500,
+		styles: {
+
+   'circle' : {
+       strokeStyle: '#542437',
+       lineWidth: 1,
+       fillStyle: '#542437',
+       angleIndicator: 'none'
+   },
+
+   'convex-polygon' : {
+       strokeStyle: '#542437',
+       lineWidth: 1,
+       fillStyle: '#542437',
+       angleIndicator: 'white'
+   }
+}
 
 	});
 	
 	world.add( renderer ); 
-	
+	*/
 
 	world.add( Physics.body('convex-polygon', {
 		x: 250,
@@ -109,7 +141,7 @@ Physics(function( world ){
 	world.render();
 
 	world.on('step', function(){
-		world.render();
+		//world.render();
 	});
    
 	Physics.util.ticker.on(function( time, dt ){
