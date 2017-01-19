@@ -6,24 +6,46 @@
 <body>
 
 
-<canvas id="viewport" width="500" height="500"></canvas>
+<canvas id="viewport" width="500" height="500" style="z-index:-1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
+<button type="button" id="oneMore" style="z-index:1; position:absolute; top:20px; left:20px;" onclick="help()">One more</button>
 <script src="physicsjs/physicsjs-full.min.js"></script>
 
 <script>
+   
+   
 
 Physics(function( world ){
+
+
    
 	var bounds = Physics.aabb(0, 0, 500, 500);
-	
+	var clicks = 0;
+
+   help = function(){
+	   clicks++;
+	   world.add( Physics.body('rectangle', {
+			x: 12,
+			y: 12,
+			vx: 0.05,
+			width: 50,
+			height: 50,
+			restitution: 0.3,
+			mass:10
+		} ))
+	console.log("pressed " + clicks + " times");
+
+   }
 	
 
 	
 
    
 	var renderer = Physics.renderer('canvas', {
+		autoResize: false,
 		el: 'viewport', // id of the canvas element
 		width: 500,
-		height: 500
+		height: 500,
+
 	});
 	
 	world.add( renderer ); 
@@ -87,19 +109,23 @@ Physics(function( world ){
 	world.render();
 
 	world.on('step', function(){
-    world.render();
-});
+		world.render();
+	});
    
 	Physics.util.ticker.on(function( time, dt ){
 		world.step( time );
 	});
 
-// start the ticker
+	// start the ticker
 	Physics.util.ticker.start();
-   
-   
+
+
+
+
+
    
 });
+
 
 </script>
 </body>
