@@ -11,7 +11,10 @@
 <script src="physicsjs/physicsjs-full.min.js"></script>
 
 <script>
-   
+   var requestAnimationFrame = window.requestAnimationFrame || 
+                            window.mozRequestAnimationFrame || 
+                            window.webkitRequestAnimationFrame || 
+                            window.msRequestAnimationFrame;
    
 
 Physics(function( world ){
@@ -38,6 +41,7 @@ Physics(function( world ){
 	});
 
    help = function(){
+
 	   clicks++;
 	   world.add( Physics.body('numberBlob', {
 			x: 12,
@@ -56,7 +60,7 @@ Physics(function( world ){
 	
 
    
-	/*var renderer = Physics.renderer('canvas', {
+	var renderer = Physics.renderer('canvas', {
 		autoResize: false,
 		el: 'viewport', // id of the canvas element
 		width: 500,
@@ -81,7 +85,7 @@ Physics(function( world ){
 	});
 	
 	world.add( renderer ); 
-	*/
+
 
 	world.add( Physics.body('convex-polygon', {
 		x: 250,
@@ -141,21 +145,24 @@ Physics(function( world ){
 	world.render();
 
 	world.on('step', function(){
-		//world.render();
+		world.render();
 	});
-   
+  /* 
 	Physics.util.ticker.on(function( time, dt ){
 		world.step( time );
 	});
-
 	// start the ticker
 	Physics.util.ticker.start();
+*/
 
-
-
-
-
-   
+	//this will be the main rendering/updating/interface loop
+	
+	drawWorld = function(){
+	world.step();
+	requestAnimationFrame(drawWorld);
+	}
+	
+	drawWorld(world);
 });
 
 
