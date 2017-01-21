@@ -6,8 +6,9 @@
 <body>
 
 
-<canvas id="viewport" width="500" height="500" style="z-index:-1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
-<button type="button" id="oneMore" style="z-index:1; position:absolute; top:20px; left:20px;" onclick="help()">One more</button>
+<canvas id="viewport" width="500" height="500" style="position:absolute; top:0px; left:0px; z-index:-1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
+<canvas id="viewport2" width="500" height="500" style="position:absolute; top:0px; left:0px; z-index:1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
+<button type="button" id="oneMore" style="z-index:2; position:absolute; top:20px; left:20px;" onclick="help()">One more</button>
 <script src="physicsjs/physicsjs-full.min.js"></script>
 
 <script>
@@ -17,9 +18,23 @@
                             window.msRequestAnimationFrame;
    
 
+var mainCanvas = document.querySelector("#viewport2");
+var mainContext = mainCanvas.getContext("2d");
+   
+   
+
+   
 Physics(function( world ){
-	function drawBlob(nB){
-	
+
+	function drawBlob(nB, ctx){
+	ctx.save();
+	ctx.fillStyle = "rgba(100,100,100,0.5)";
+	ctx.translate(nB.x,nB.y);
+	ctx.arc(0,0,50,0,2*Math.PI);
+	ctx.fillStyle = "black";
+	ctx.font = "20px Arial";
+	ctx.fillText(nB.value, 0,0);
+	ctx.restore();
 	
 	
 	}
@@ -115,19 +130,19 @@ Physics(function( world ){
 	}) );
 	
    
-	var square = Physics.body('rectangle', {
+	var blobulon = Physics.body('numberBlob', {
 		x: 250,
 		y: 250,
 		vx: 0.05,
-		width: 50,
-		height: 50,
+		radius: 30,
+		value: Math.random(),
 		restitution: 0.3,
 		mass:10
 	});
 	
 
 	
-	world.add( square );
+	world.add( blobulon );
 	
 	
 		world.add( Physics.behavior('edge-collision-detection', {
@@ -142,12 +157,12 @@ Physics(function( world ){
 	world.add( Physics.behavior('interactive', { el: renderer.el }));
 	
 
-	world.render();
+	/*world.render();
 
 	world.on('step', function(){
 		world.render();
 	});
-  /* 
+   
 	Physics.util.ticker.on(function( time, dt ){
 		world.step( time );
 	});
@@ -158,6 +173,7 @@ Physics(function( world ){
 	//this will be the main rendering/updating/interface loop
 	
 	drawWorld = function(){
+	drawBlob(blobulon, mainContext);
 	world.step();
 	requestAnimationFrame(drawWorld);
 	}
