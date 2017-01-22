@@ -109,15 +109,15 @@ Physics(function( world ){
 	
 	//double-tap-zoom prevention (thanks Evrim Persembe at http://stackoverflow.com/questions/10614481/disable-double-tap-zoom-option-in-browser-on-touch-devices
 	
-	mainDiv.addEventListener('touchstart', touchStart(e));
+	mainDiv.addEventListener('touchstart', touchStart(event));
 	
 	
 	var clickTimer = null;
 
-	function touchStart() {
+	function touchStart(e) {
     if (clickTimer == null) {
         clickTimer = setTimeout(function () {
-            clickTimer = null; 
+         clickTimer = null; 
 
         }, 500)
     } else {
