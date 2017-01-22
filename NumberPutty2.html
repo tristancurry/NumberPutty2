@@ -18,7 +18,7 @@
 
 <body>
 
-<div class="noselect">
+<div class="noselect" id="mainDiv">
 <canvas id="viewport" width="500" height="500" style="position:absolute; top:0px; left:0px; z-index:1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
 <canvas id="viewport2" width="500" height="500" style="position:absolute; top:0px; left:0px; z-index:0; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
 <button type="button" id="oneMore" style="z-index:2; position:absolute; top:20px; left:20px;" onclick="help()">One more</button>
@@ -32,6 +32,7 @@
                             window.msRequestAnimationFrame;
    
 
+var mainDiv = document.querySelector("#mainDiv");
 var mainCanvas = document.querySelector("#viewport");
 var mainContext = mainCanvas.getContext("2d");
 
@@ -83,8 +84,7 @@ Physics(function( world ){
 		mouseX = event.pageX - mainCanvas.offsetLeft;
 		mouseY = event.pageY - mainCanvas.offsetTop;
 	});
-
-	mainCanvas.addEventListener('dblclick', function(){ 
+	doubleClick = function(){ 
 	//do magical things involving breaking into two parts (eventually). Right now it just increments the value of the appropriate blob.
 		for(n in world._bodies){
 			var nB = world._bodies[n];
@@ -99,11 +99,15 @@ Physics(function( world ){
 				break;
 			}
 		}
-	})
+	}
+	mainCanvas.addEventListener('dblclick', doubleClick);
+	
+	
+
 	
 	//double-tap-zoom prevention (thanks Evrim Persembe at http://stackoverflow.com/questions/10614481/disable-double-tap-zoom-option-in-browser-on-touch-devices
 	
-	mainCanvas.addEventListener('touchstart', preventZoom);
+	mainDiv.addEventListener('touchstart', preventZoom);
 	
 	function preventZoom(e) {
 		var t2 = e.timeStamp;
@@ -115,7 +119,7 @@ Physics(function( world ){
 		if (!dt || dt > 500 || fingers > 1) return; // not double-tap
 
 		e.preventDefault();
-		e.target.click();
+		e.target.doubleClick();
 }
 
 
