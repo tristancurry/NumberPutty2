@@ -21,6 +21,9 @@
 var mainCanvas = document.querySelector("#viewport2");
 var mainContext = mainCanvas.getContext("2d");
 
+	var width = mainCanvas.width;
+	var height = mainCanvas.height;
+
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
 var keys = {37: 1, 38: 1, 39: 1, 40: 1};
@@ -64,7 +67,7 @@ Physics(function( world ){
 	ctx.translate(nB.state.pos.x,nB.state.pos.y);
 	ctx.rotate(nB.state.angular.pos);
 	ctx.beginPath();
-	ctx.arc(0,0,30,0,2*Math.PI);
+	ctx.arc(0,0,nB.radius,0,2*Math.PI);
 	ctx.fill();
 	ctx.stroke();
 	ctx.fillStyle = "black";
@@ -72,7 +75,6 @@ Physics(function( world ){
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
 	ctx.fillText(nB.value, 0,0);
-	console.log(nB);
 	ctx.restore();
 	
 	
@@ -85,8 +87,6 @@ Physics(function( world ){
 	
 	Physics.body('numberBlob', 'circle', function( parent ){
 	
-	
-
     return {
 	
 
@@ -103,7 +103,7 @@ Physics(function( world ){
 			radius: 30,
 			restitution: 0.9,
 			mass:10,
-			value: Math.round(100*Math.random())
+			value: 1
 		} ))
 	console.log("pressed " + clicks + " times");
 
@@ -122,36 +122,8 @@ Physics(function( world ){
 	
 	world.add( renderer ); 
 
-
-	world.add( Physics.body('convex-polygon', {
-		x: 250,
-		y: 50,
-		vx: 0.05,
-		restitution: 1,
-		treatment: "static",
-		vertices: [
-			{x: 0, y: 80},
-			{x: 60, y: 40},
-			{x: 60, y: -40},
-			{x: 0, y: -80}
-		]
-	}) );
-
-	world.add( Physics.body('convex-polygon', {
-		x: 400,
-		y: 200,
-		vx: -0.02,
-		restitution: 1,
-				treatment: "static",
-		vertices: [
-			{x: 0, y: 80},
-			{x: 80, y: 0},
-			{x: 0, y: -80},
-			{x: -30, y: -30},
-			{x: -30, y: 30}
-		]
-	}) );
 	
+
    
 	var blobulon = Physics.body('numberBlob', {
 		x: 250,
@@ -165,8 +137,24 @@ Physics(function( world ){
 	});
 	
 
+	(function(){
+	do {
+	world.add( Physics.body('numberBlob', {
+		x: 250,
+		y: 250,
+		vx: 0.05,
+		value: Math.round(100*Math.random()),
+		radius: 20,
+		restitution: 0.3,
+		cof: 0.8,
+		mass:10
+	
+	}))} while (world._bodies.length < 20);
+	})();
+	
 	
 	world.add( blobulon );
+	
 	
 	
 		world.add( Physics.behavior('edge-collision-detection', {
@@ -175,7 +163,7 @@ Physics(function( world ){
 	}) );
 	// ensure objects bounce when edge collision is detected
 	world.add( Physics.behavior('body-impulse-response') );
-	//world.add( Physics.behavior('constant-acceleration') );
+	world.add( Physics.behavior('constant-acceleration') );
 	world.add( Physics.behavior('body-collision-detection') );
 	world.add( Physics.behavior('sweep-prune') );
 	world.add( Physics.behavior('interactive', { el: renderer.el }));
@@ -197,12 +185,16 @@ Physics(function( world ){
 	//this will be the main rendering/updating/interface loop
 	
 	drawWorld = function(){
-	drawBlob(blobulon, mainContext);
+	mainContext.clearRect(0,0, width, height);
+	for(n in world._bodies){
+	drawBlob(world._bodies[n], mainContext);
+	}
 	world.step();
+	console.log(world);
 	requestAnimationFrame(drawWorld);
 	}
 	disableScroll();
-	drawWorld(world);
+	drawWorld();
 });
 
 
