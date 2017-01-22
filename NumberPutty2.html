@@ -20,10 +20,42 @@
 
 var mainCanvas = document.querySelector("#viewport2");
 var mainContext = mainCanvas.getContext("2d");
-   
-   
 
-   
+// left: 37, up: 38, right: 39, down: 40,
+// spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
+var keys = {37: 1, 38: 1, 39: 1, 40: 1};
+
+function preventDefault(e) {
+  e = e || window.event;
+  if (e.preventDefault)
+      e.preventDefault();
+  e.returnValue = false;  
+}
+
+function preventDefaultForScrollKeys(e) {
+    if (keys[e.keyCode]) {
+        preventDefault(e);
+        return false;
+    }
+}
+
+function disableScroll() {
+  if (window.addEventListener) // older FF
+      window.addEventListener('DOMMouseScroll', preventDefault, false);
+  window.onwheel = preventDefault; // modern standard
+  window.onmousewheel = document.onmousewheel = preventDefault; // older browsers, IE
+  window.ontouchmove  = preventDefault; // mobile
+  document.onkeydown  = preventDefaultForScrollKeys;
+}
+
+function enableScroll() {
+    if (window.removeEventListener)
+        window.removeEventListener('DOMMouseScroll', preventDefault, false);
+    window.onmousewheel = document.onmousewheel = null; 
+    window.onwheel = null; 
+    window.ontouchmove = null;  
+    document.onkeydown = null;  
+}
 Physics(function( world ){
 
 	function drawBlob(nB, ctx){
@@ -32,7 +64,7 @@ Physics(function( world ){
 	ctx.translate(nB.state.pos.x,nB.state.pos.y);
 	ctx.rotate(nB.state.angular.pos);
 	ctx.beginPath();
-	ctx.arc(0,0,10,0,2*Math.PI);
+	ctx.arc(0,0,30,0,2*Math.PI);
 	ctx.fill();
 	ctx.stroke();
 	ctx.fillStyle = "black";
@@ -68,7 +100,7 @@ Physics(function( world ){
 			x: 12,
 			y: 12,
 			vx: 0.05,
-			radius: 25,
+			radius: 30,
 			restitution: 0.9,
 			mass:10,
 			value: Math.round(100*Math.random())
@@ -125,7 +157,7 @@ Physics(function( world ){
 		x: 250,
 		y: 250,
 		vx: 0.05,
-		radius: 10,
+		radius: 30,
 		value: Math.round(100*Math.random()),
 		restitution: 1.0,
 		cof: 0,
