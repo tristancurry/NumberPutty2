@@ -84,6 +84,8 @@ Physics(function( world ){
 		mouseX = event.pageX - mainDiv.offsetLeft;
 		mouseY = event.pageY - mainDiv.offsetTop;
 	});
+	
+	
 	doubleClick = function(){ 
 	//do magical things involving breaking into two parts (eventually). Right now it just increments the value of the appropriate blob.
 		for(n in world._bodies){
@@ -107,7 +109,25 @@ Physics(function( world ){
 	
 	//double-tap-zoom prevention (thanks Evrim Persembe at http://stackoverflow.com/questions/10614481/disable-double-tap-zoom-option-in-browser-on-touch-devices
 	
-	mainDiv.addEventListener('touchstart', preventZoom);
+	mainDiv.addEventListener('touchstart', touchStart);
+	
+	
+	var clickTimer = null;
+
+	function touchStart() {
+    if (clickTimer == null) {
+        clickTimer = setTimeout(function () {
+            clickTimer = null;
+            alert("single");
+
+        }, 500)
+    } else {
+        clearTimeout(clickTimer);
+        clickTimer = null;
+        alert("double");
+
+    }
+}
 	
 	function preventZoom(e) {
 		var t2 = e.timeStamp;
