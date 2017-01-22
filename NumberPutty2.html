@@ -1,14 +1,28 @@
 <html>
 <!-- NumberPutty 2 2017 -->
-<head></head>
+<head>
+<style>
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari*/
+     -khtml-user-select: none; /* Konqueror */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
+</style>
+</head>
 
 
 <body>
 
-
+<div class="noselect">
 <canvas id="viewport" width="500" height="500" style="position:absolute; top:0px; left:0px; z-index:1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
 <canvas id="viewport2" width="500" height="500" style="position:absolute; top:0px; left:0px; z-index:0; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
 <button type="button" id="oneMore" style="z-index:2; position:absolute; top:20px; left:20px;" onclick="help()">One more</button>
+<div>
 <script src="physicsjs/physicsjs-full.min.js"></script>
 
 <script>
@@ -18,11 +32,13 @@
                             window.msRequestAnimationFrame;
    
 
-var mainCanvas = document.querySelector("#viewport2");
+var mainCanvas = document.querySelector("#viewport");
 var mainContext = mainCanvas.getContext("2d");
 
-	var width = mainCanvas.width;
-	var height = mainCanvas.height;
+var width = mainCanvas.width;
+var height = mainCanvas.height;
+
+
 
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
@@ -61,23 +77,46 @@ function enableScroll() {
 }
 Physics(function( world ){
 
+	mainCanvas.addEventListener('mousemove', function(event){
+		mouseX = event.pageX - mainCanvas.offsetLeft;
+		mouseY = event.pageY - mainCanvas.offsetTop;
+	});
+
+	mainCanvas.addEventListener('dblclick', function(){ 
+	//do magical things involving breaking into two parts (eventually). Right now it just increments the value of the appropriate blob.
+		for(n in world._bodies){
+			var nB = world._bodies[n];
+			var distSq = Math.pow(mouseX - nB.state.pos.x,2) + Math.pow(mouseY - nB.state.pos.y,2);
+			if(distSq < Math.pow(nB.radius,2)){
+				nB.value+=50;
+				nB.getSize(nB.value);
+				nB.geometry = Physics.geometry('circle', {
+					radius: nB.radius
+				});
+				nB.recalc();
+				break;
+			}
+		}
+	})
+
+
+
+	//this might end up belonging to the 'blob' object itself
 	function drawBlob(nB, ctx){
-	ctx.save();
-	ctx.fillStyle = "rgba(100,100,100,0.5)";
-	ctx.translate(nB.state.pos.x,nB.state.pos.y);
-	ctx.rotate(nB.state.angular.pos);
-	ctx.beginPath();
-	ctx.arc(0,0,nB.radius,0,2*Math.PI);
-	ctx.fill();
-	ctx.stroke();
-	ctx.fillStyle = "black";
-	ctx.font = "20px Arial";
-	ctx.textAlign = "center";
-	ctx.textBaseline = "middle";
-	ctx.fillText(nB.value, 0,0);
-	ctx.restore();
-	
-	
+		ctx.save();
+		ctx.fillStyle = "rgba(100,100,100,1)";
+		ctx.translate(nB.state.pos.x,nB.state.pos.y);
+		ctx.rotate(nB.state.angular.pos);
+		ctx.beginPath();
+		ctx.arc(0,0,nB.radius,0,2*Math.PI);
+		ctx.fill();
+		ctx.stroke();
+		ctx.fillStyle = "black";
+		ctx.font = "20px Arial";
+		ctx.textAlign = "center";
+		ctx.textBaseline = "middle";
+		ctx.fillText(nB.value, 0,0);
+		ctx.restore();
 	}
 
    
@@ -86,31 +125,39 @@ Physics(function( world ){
 	
 	
 	Physics.body('numberBlob', 'circle', function( parent ){
-	
-    return {
-	
+		return {
 
+		
+		getSize: function(val){
+			this.radius = 15*Math.pow(val, 0.25);
+		
+		}
+		
+		
 		};
+
 	});
 
    help = function(){
-
-	   clicks++;
-	   world.add( Physics.body('numberBlob', {
-			x: 12,
-			y: 12,
-			vx: 0.05,
-			radius: 30,
-			restitution: 0.9,
-			mass:10,
-			value: 1
-		} ))
-	console.log("pressed " + clicks + " times");
-
+		clicks++;
+		createBlob(1,20,20);
+		console.log("pressed " + clicks + " times");
    }
 	
-
 	
+	createBlob = function(val, _x, _y){
+		var rad = Math.round(15*Math.pow(val,0.25));
+		world.add( Physics.body('numberBlob', {
+			x: _x,
+			y: _y,
+			vx: 0.15,
+			value: val,
+			radius: rad,
+			restitution: 0.3,
+			cof: 0.8,
+			mass: 0.01
+		}))
+	}
 
    
 	var renderer = Physics.renderer('canvas', {
@@ -120,78 +167,44 @@ Physics(function( world ){
 		height: 500,
 	});
 	
+	//default renderer is just being used to handle the dragging at this stage
 	world.add( renderer ); 
-
-	
-
    
-	var blobulon = Physics.body('numberBlob', {
-		x: 250,
-		y: 250,
-		vx: 0.05,
-		radius: 30,
-		value: Math.round(100*Math.random()),
-		restitution: 1.0,
-		cof: 0,
-		mass:10
-	});
+	var blobulon = createBlob(0.5, 250,250);
 	
 
 	(function(){
 	do {
-	world.add( Physics.body('numberBlob', {
-		x: 250,
-		y: 250,
-		vx: 0.05,
-		value: Math.round(100*Math.random()),
-		radius: 20,
-		restitution: 0.3,
-		cof: 0.8,
-		mass:10
-	
-	}))} while (world._bodies.length < 20);
+		createBlob(Math.ceil(100*Math.random()),250,250);
+		} while (world._bodies.length < 20);
 	})();
 	
 	
-	world.add( blobulon );
 	
-	
-	
-		world.add( Physics.behavior('edge-collision-detection', {
+	//adding behaviours to world
+	world.add( Physics.behavior('edge-collision-detection', {
 		aabb: bounds,
-		restitution: 1  //default is 1.0 for perfectly elastic collision 
+		restitution: 0.8  //default is 1.0 for perfectly elastic collision 
 	}) );
 	// ensure objects bounce when edge collision is detected
 	world.add( Physics.behavior('body-impulse-response') );
-	world.add( Physics.behavior('constant-acceleration') );
+	world.add( Physics.behavior('constant-acceleration', {  acc: { x : 0, y: 0.0040 }}) );
 	world.add( Physics.behavior('body-collision-detection') );
 	world.add( Physics.behavior('sweep-prune') );
 	world.add( Physics.behavior('interactive', { el: renderer.el }));
 	
 
-	/*world.render();
 
-	world.on('step', function(){
-		world.render();
-	});
-   
-	Physics.util.ticker.on(function( time, dt ){
-		world.step( time );
-	});
-	// start the ticker
-	Physics.util.ticker.start();
-*/
-
-	//this will be the main rendering/updating/interface loop
+	//this is the main rendering/updating/interface loop
 	
 	drawWorld = function(){
-	mainContext.clearRect(0,0, width, height);
-	for(n in world._bodies){
-	drawBlob(world._bodies[n], mainContext);
-	}
-	world.step();
-	console.log(world);
-	requestAnimationFrame(drawWorld);
+		mainContext.fillStyle = "rgba(255,255,255,0)";
+		mainContext.fillRect(0,0, width, height);
+		for(n in world._bodies){
+			drawBlob(world._bodies[n], mainContext);
+		}
+		world.step();
+		requestAnimationFrame(drawWorld);
 	}
 	disableScroll();
 	drawWorld();
