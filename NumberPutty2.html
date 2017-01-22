@@ -19,8 +19,8 @@
 <body>
 
 <div class="noselect" id="mainDiv">
-<canvas id="viewport" width="500" height="500" style="position:absolute; top:0px; left:0px; z-index:1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
-<canvas id="viewport2" width="500" height="500" style="position:absolute; top:0px; left:0px; z-index:0; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
+<canvas id="viewport" width="600" height="600" style="position:absolute; top:0px; left:0px; z-index:1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
+<canvas id="viewport2" width="600" height="600" style="position:absolute; top:0px; left:0px; z-index:0; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
 <button type="button" id="oneMore" style="z-index:2; position:absolute; top:20px; left:20px;" onclick="help()">One more</button>
 <div>
 <script src="physicsjs/physicsjs-full.min.js"></script>
@@ -166,15 +166,16 @@ Physics(function( world ){
 	//this might end up belonging to the 'blob' object itself
 	function drawBlob(nB, ctx){
 		ctx.save();
-		ctx.fillStyle = "rgba(100,100,100,1)";
+		ctx.strokeStyle = "rgba(255,255,255,1)";
+		ctx.fillStyle = "rgba(30,30,90,0.7)";
 		ctx.translate(nB.state.pos.x,nB.state.pos.y);
 		ctx.rotate(nB.state.angular.pos);
 		ctx.beginPath();
 		ctx.arc(0,0,nB.radius,0,2*Math.PI);
 		ctx.fill();
 		ctx.stroke();
-		ctx.fillStyle = "black";
-		ctx.font = "20px Arial";
+		ctx.fillStyle = "rgba(255,255,255,1)";
+		ctx.font = "30px Helvetica";
 		ctx.textAlign = "center";
 		ctx.textBaseline = "middle";
 		ctx.fillText(nB.value, 0,0);
@@ -182,7 +183,7 @@ Physics(function( world ){
 	}
 
    
-	var bounds = Physics.aabb(0, 0, 500, 500);
+	var bounds = Physics.aabb(0, 0, 600, 600);
 	var clicks = 0;
 	
 	
@@ -220,8 +221,8 @@ Physics(function( world ){
 	var renderer = Physics.renderer('canvas', {
 		autoResize: false,
 		el: 'viewport', // id of the canvas element
-		width: 500,
-		height: 500,
+		width: 600,
+		height: 600,
 	});
 	
 	//default renderer is just being used to handle the dragging at this stage
@@ -230,7 +231,7 @@ Physics(function( world ){
 	
 
 	(function(){
-	var budget = 100;
+	var budget = 50;
 	do {
 		var thisVal = Math.ceil(budget*Math.random());
 		createBlob(thisVal,250,250);
@@ -247,7 +248,7 @@ Physics(function( world ){
 	}) );
 	// ensure objects bounce when edge collision is detected
 	world.add( Physics.behavior('body-impulse-response') );
-	world.add( Physics.behavior('constant-acceleration', {  acc: { x : 0, y: 0.0040 }}) );
+	world.add( Physics.behavior('constant-acceleration', {  acc: { x : 0, y: 0.00040 }}) );
 	world.add( Physics.behavior('body-collision-detection') );
 	world.add( Physics.behavior('sweep-prune') );
 	world.add( Physics.behavior('interactive', { el: renderer.el }));
@@ -257,7 +258,7 @@ Physics(function( world ){
 	//this is the main rendering/updating/interface loop
 	
 	drawWorld = function(){
-		mainContext.fillStyle = "rgba(255,255,255,0)";
+		mainContext.fillStyle = "rgba(20,0,20,0)";
 		mainContext.fillRect(0,0, width, height);
 		for(n in world._bodies){
 			drawBlob(world._bodies[n], mainContext);
@@ -266,6 +267,8 @@ Physics(function( world ){
 		requestAnimationFrame(drawWorld);
 	}
 	disableScroll();
+			mainContext.fillStyle = "rgba(20,0,20,1)";
+		mainContext.fillRect(0,0, width, height);
 	drawWorld();
 });
 
