@@ -80,9 +80,9 @@ function enableScroll() {
 
 Physics(function( world ){
 
-	mainCanvas.addEventListener('mousemove', function(event){
-		mouseX = event.pageX - mainCanvas.offsetLeft;
-		mouseY = event.pageY - mainCanvas.offsetTop;
+	mainDiv.addEventListener('mousemove', function(event){
+		mouseX = event.pageX - mainDiv.offsetLeft;
+		mouseY = event.pageY - mainDiv.offsetTop;
 	});
 	doubleClick = function(){ 
 	//do magical things involving breaking into two parts (eventually). Right now it just increments the value of the appropriate blob.
