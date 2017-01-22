@@ -6,8 +6,8 @@
 <body>
 
 
-<canvas id="viewport" width="500" height="500" style="position:absolute; top:0px; left:0px; z-index:-1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
-<canvas id="viewport2" width="500" height="500" style="position:absolute; top:0px; left:0px; z-index:1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
+<canvas id="viewport" width="500" height="500" style="position:absolute; top:0px; left:0px; z-index:1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
+<canvas id="viewport2" width="500" height="500" style="position:absolute; top:0px; left:0px; z-index:0; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
 <button type="button" id="oneMore" style="z-index:2; position:absolute; top:20px; left:20px;" onclick="help()">One more</button>
 <script src="physicsjs/physicsjs-full.min.js"></script>
 
@@ -29,11 +29,18 @@ Physics(function( world ){
 	function drawBlob(nB, ctx){
 	ctx.save();
 	ctx.fillStyle = "rgba(100,100,100,0.5)";
-	ctx.translate(nB.x,nB.y);
-	ctx.arc(0,0,50,0,2*Math.PI);
+	ctx.translate(nB.state.pos.x,nB.state.pos.y);
+	ctx.rotate(nB.state.angular.pos);
+	ctx.beginPath();
+	ctx.arc(0,0,10,0,2*Math.PI);
+	ctx.fill();
+	ctx.stroke();
 	ctx.fillStyle = "black";
 	ctx.font = "20px Arial";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
 	ctx.fillText(nB.value, 0,0);
+	console.log(nB);
 	ctx.restore();
 	
 	
@@ -50,7 +57,6 @@ Physics(function( world ){
 
     return {
 	
-		
 
 		};
 	});
@@ -65,7 +71,7 @@ Physics(function( world ){
 			radius: 25,
 			restitution: 0.9,
 			mass:10,
-			value: Math.random()
+			value: Math.round(100*Math.random())
 		} ))
 	console.log("pressed " + clicks + " times");
 
@@ -80,23 +86,6 @@ Physics(function( world ){
 		el: 'viewport', // id of the canvas element
 		width: 500,
 		height: 500,
-		styles: {
-
-   'circle' : {
-       strokeStyle: '#542437',
-       lineWidth: 1,
-       fillStyle: '#542437',
-       angleIndicator: 'none'
-   },
-
-   'convex-polygon' : {
-       strokeStyle: '#542437',
-       lineWidth: 1,
-       fillStyle: '#542437',
-       angleIndicator: 'white'
-   }
-}
-
 	});
 	
 	world.add( renderer ); 
@@ -106,7 +95,8 @@ Physics(function( world ){
 		x: 250,
 		y: 50,
 		vx: 0.05,
-		restitution: 0.3,
+		restitution: 1,
+		treatment: "static",
 		vertices: [
 			{x: 0, y: 80},
 			{x: 60, y: 40},
@@ -119,7 +109,8 @@ Physics(function( world ){
 		x: 400,
 		y: 200,
 		vx: -0.02,
-		restitution: 0.3,
+		restitution: 1,
+				treatment: "static",
 		vertices: [
 			{x: 0, y: 80},
 			{x: 80, y: 0},
@@ -134,9 +125,10 @@ Physics(function( world ){
 		x: 250,
 		y: 250,
 		vx: 0.05,
-		radius: 30,
-		value: Math.random(),
-		restitution: 0.3,
+		radius: 10,
+		value: Math.round(100*Math.random()),
+		restitution: 1.0,
+		cof: 0,
 		mass:10
 	});
 	
@@ -147,11 +139,11 @@ Physics(function( world ){
 	
 		world.add( Physics.behavior('edge-collision-detection', {
 		aabb: bounds,
-		restitution: 0.6  //default is 1.0 for perfectly elastic collision 
+		restitution: 1  //default is 1.0 for perfectly elastic collision 
 	}) );
 	// ensure objects bounce when edge collision is detected
 	world.add( Physics.behavior('body-impulse-response') );
-	world.add( Physics.behavior('constant-acceleration') );
+	//world.add( Physics.behavior('constant-acceleration') );
 	world.add( Physics.behavior('body-collision-detection') );
 	world.add( Physics.behavior('sweep-prune') );
 	world.add( Physics.behavior('interactive', { el: renderer.el }));
