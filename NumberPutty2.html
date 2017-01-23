@@ -19,7 +19,7 @@
 <body>
 
 <div class="noselect" id="mainDiv">
-<canvas class="needsclick" id="viewport" width="600" height="600" style="position:absolute; top:0px; left:0px; z-index:1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
+<canvas id="viewport" width="600" height="600" style="position:absolute; top:0px; left:0px; z-index:1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
 <canvas id="viewport2" width="600" height="600" style="position:absolute; top:0px; left:0px; z-index:0; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
 <button type="button" id="oneMore" style="z-index:2; position:absolute; top:20px; left:20px;" onclick="help()">One more</button>
 <div>
@@ -48,7 +48,7 @@ window.addEventListener('load', function() {
 }, false);
 
 
-/*
+
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
 var keys = {37: 1, 38: 1, 39: 1, 40: 1};
@@ -85,7 +85,7 @@ function enableScroll() {
     document.onkeydown = null;  
 }
 
-*/
+
 Physics(function( world ){
 
 	mainDiv.addEventListener('mousemove', function(event){
@@ -274,7 +274,7 @@ Physics(function( world ){
 		world.step();
 		requestAnimationFrame(drawWorld);
 	}
-	//disableScroll();
+	disableScroll();
 			mainContext.fillStyle = "rgba(20,0,20,1)";
 		mainContext.fillRect(0,0, width, height);
 	drawWorld();
