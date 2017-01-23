@@ -21,8 +21,12 @@
 <div class="noselect" id="mainDiv">
 <canvas id="viewport" width="600" height="600" style="position:absolute; top:0px; left:0px; z-index:1; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
 <canvas id="viewport2" width="600" height="600" style="position:absolute; top:0px; left:0px; z-index:0; border-style:inset; border-color:#FF0000; border-width:5px;"></canvas>
-<button type="button" id="oneMore" style="z-index:2; position:absolute; top:20px; left:20px;" onclick="help()">One more</button>
-<div>
+<div id="buttons" style="z-index:2; position:absolute; top:5px; left:5px; width:590px; height:50px; clear:both">
+<button type="button" id="oneMore"  style="float:left; margin-left:20px;" onclick="help(1)">One more</button>
+<button type="button" id="oneLess" style="float:right; margin-right:20px;" onclick="help(-1)">One less</button>
+</div>
+<button type="button" id="add1" style="position:absolute; z-index:3; width: 100px; height: 50px;">ADD</button>
+</div>
 <script src="physicsjs/physicsjs-full.min.js"></script>
 
 <script>
@@ -30,6 +34,7 @@
                             window.mozRequestAnimationFrame || 
                             window.webkitRequestAnimationFrame || 
                             window.msRequestAnimationFrame;
+							
    
 
 var mainDiv = document.querySelector("#mainDiv");
@@ -39,7 +44,7 @@ var mainContext = mainCanvas.getContext("2d");
 var width = mainCanvas.width;
 var height = mainCanvas.height;
 
-
+var add1 = document.querySelector("#add1");
 
 // left: 37, up: 38, right: 39, down: 40,
 // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
@@ -112,7 +117,7 @@ Physics(function( world ){
 
 	
 	for(f in frags){
-		createBlob(frags[f],nB.state.pos.x, nB.state.pos.y);
+		createBlob(frags[f],nB.state.pos.x, nB.state.pos.y, 0.2 - 0.4*Math.random(), 0.2 - 0.4*Math.random());
 	}
 	
 	}
@@ -196,27 +201,64 @@ Physics(function( world ){
 
 	});
 
-   help = function(){
+   help = function(val){
 		clicks++;
-		createBlob(1,20,20);
+		createBlob(val,mouseX,mouseY+30,0.4 - 0.8*Math.random(), 1);
 		console.log("pressed " + clicks + " times");
    }
 	
 	
-	createBlob = function(val, _x, _y){
-		var rad = Math.ceil(30*Math.pow(val,0.25));
+	createBlob = function(val, _x, _y, _vx, _vy){
+		var rad = Math.ceil(30*Math.pow(Math.abs(val),0.25));
 		world.add( Physics.body('numberBlob', {
+		blob:true,
 			x: _x,
 			y: _y,
-			vx: 0.15,
+			vx: _vx,
+			vy: _vy,
 			value: val,
 			radius: rad,
 			restitution: 0.2,
 			cof: 0.8,
-			mass: 0.001*val
+			mass: 0.001*Math.abs(val)
 		}))
 	}
-
+        var bucket = Physics.body('compound', {
+        x: width/2
+        ,y: height/2 + 105
+        ,treatment: 'dynamic'
+        ,styles: {
+            fillStyle: "rgba(255,0,0,0.8)"
+            ,lineWidth: 1
+            ,strokeStyle: "rgba(100,0,0,0.8)"
+            ,alpha: 0.0001 //pixi bug
+        }
+        ,children: [
+        Physics.body('rectangle', {
+            x: 1*width/4
+            ,y: height/2
+            ,width: 20
+            ,height: 150
+            ,mass: 40
+        })
+		,Physics.body('rectangle', {
+            x: 3*width/4
+            ,y: height/2
+            ,width: 20
+            ,height: 150
+            ,mass: 40
+        })
+        ,Physics.body('rectangle', {
+            x: width/2
+            ,y: height/2 + 105
+            ,width: width/2 + 20
+            ,height: 60
+            ,mass: 40
+        })
+        ]
+    });
+	
+	world.add(bucket);
    
 	var renderer = Physics.renderer('canvas', {
 		autoResize: false,
@@ -234,7 +276,7 @@ Physics(function( world ){
 	var budget = 50;
 	do {
 		var thisVal = Math.ceil(budget*Math.random());
-		createBlob(thisVal,250,250);
+		createBlob(thisVal,250,250, 0,0);
 		budget = budget - thisVal
 		} while (budget > 0);
 	})();
@@ -258,16 +300,26 @@ Physics(function( world ){
 	//this is the main rendering/updating/interface loop
 	
 	drawWorld = function(){
-		mainContext.fillStyle = "rgba(20,0,20,0)";
+		mainContext.fillStyle = "rgba(20,0,20,1)";
 		mainContext.fillRect(0,0, width, height);
 		for(n in world._bodies){
+		if(world._bodies[n].blob){
 			drawBlob(world._bodies[n], mainContext);
 		}
+		}
 		world.step();
+		//world.render();
+		var deg = 360*bucket.state.angular.pos/(2*Math.PI);
+		var pos = [bucket.state.pos.x,bucket.state.pos.y];
+		add1.style.transform = 'translate('+pos[0]+'px, '+pos[1]+'px) rotate('+deg+'deg) ';
+		//add1.style.webkitTransform = 'rotate('+deg+'deg)';
+		//add1.style.mozTransform    = 'rotate('+deg+'deg)'; 
+		//add1.style.msTransform     = 'rotate('+deg+'deg)';
+		//add1.style.oTransform      = 'rotate('+deg+'deg)';
 		requestAnimationFrame(drawWorld);
 	}
 	disableScroll();
-			mainContext.fillStyle = "rgba(20,0,20,1)";
+		mainContext.fillStyle = "rgba(20,0,20,1)";
 		mainContext.fillRect(0,0, width, height);
 	drawWorld();
 });
